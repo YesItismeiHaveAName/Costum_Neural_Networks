@@ -1,4 +1,4 @@
-from General_Functions import rng_value
+from General_Functions import rng_value, cut_decimals
 from Neuron import Neuron
 
 
@@ -46,7 +46,7 @@ class Layer:
 
     def normalize_neurons(self):
         for neuron in self.neurons:
-            new_value = float(int(neuron.get_value() * 100) / 100)
+            new_value = cut_decimals(neuron.get_value(), 2)
             neuron.set_value(new_value)
 
 

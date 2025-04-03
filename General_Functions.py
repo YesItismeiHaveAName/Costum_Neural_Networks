@@ -36,5 +36,23 @@ class SOFTMAX(Activation_Function):
 
 
 
+class Loss_Functions:
+    def calculate_error(self, prediction, label):
+        pass
+
+class SQUARED_ERROR(Loss_Functions):
+    def calculate_error(self, prediction, label):
+        result = 0.0
+        for i in range(len(prediction)):
+            result += (prediction[i] - label[i])**2
+        result = result / len(prediction)
+        return result
+#add more Loss-Functions
+
 def rng_value():
     return float(random()-0.5)*3
+
+
+def cut_decimals(value, number_of_decimals):
+    div = 10**number_of_decimals
+    return float(int(value * div) / div)

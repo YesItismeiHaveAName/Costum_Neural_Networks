@@ -1,4 +1,3 @@
-from General_Functions import *
 from Layers import *
 
 
@@ -7,6 +6,7 @@ class Model:
         self.hidden_layers = []
         self.input_layer_dimension = None
         self.output_layer = None
+        self.loss_function = None
         pass
 
     def add_input_layer(self, input_dimension):
@@ -65,6 +65,11 @@ class Model:
     def get_prediction(self):
         self.output_layer.print_prediction()
         print(self.output_layer.get_predicted_label())
+
+
+    def check_model(self):
+        if self.input_layer_dimension is None or self.output_layer is None or self.loss_function is None:
+            raise RuntimeError("Model hasn't been provided with Input-, Outputlayer or Loss-Function.")
 
     def activate_model(self, input_values):
         #just Check whether the Input-Data matches the Input-Dimension.
