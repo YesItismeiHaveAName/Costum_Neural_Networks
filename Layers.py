@@ -21,7 +21,7 @@ class Layer:
             value = 0.0
             for x in range(len(self.connections[y])):
                 value += input_values[x] * self.connections[y][x]
-            self.neurons[y].set_value(value)
+            self.neurons[y].set_value(value + self.neurons[y].get_bias())
 
     def activate_neurons(self):
         all_neuron_values = self.get_output_values()

@@ -4,6 +4,8 @@ from random import random
 class Activation_Function:
     def activate(self, value, other_values):
         pass
+    def get_derivative(self, value):
+        pass
 class RELU(Activation_Function):
     def __init__(self):
         pass
@@ -12,12 +14,22 @@ class RELU(Activation_Function):
             return value
         return 0.0
 
+    def get_derivative(self, value):
+        if value > 0.0:
+            return 1.0
+        return 0.0
+
 class BINARY_STEP(Activation_Function):
     def __init__(self, threshold):
         self.threshold = threshold
 
     def activate(self, value, other_values):
         if value > self.threshold:
+            return 1.0
+        return 0.0
+
+    def get_derivative(self, value):
+        if value >= self.threshold:
             return 1.0
         return 0.0
 
@@ -35,9 +47,10 @@ class SOFTMAX(Activation_Function):
         return float(value**self.exponent / div)
 
 
-
 class Loss_Functions:
     def calculate_error(self, prediction, label):
+        pass
+    def derivative(self, prediction, label, num_of_neurons):
         pass
 
 class SQUARED_ERROR(Loss_Functions):
@@ -47,6 +60,11 @@ class SQUARED_ERROR(Loss_Functions):
             result += (prediction[i] - label[i])**2
         result = result / len(prediction)
         return result
+
+    def derivative(self, prediction, label, num_of_neurons):
+        return (2/num_of_neurons) * (prediction - label)
+
+
 #add more Loss-Functions
 
 def rng_value():

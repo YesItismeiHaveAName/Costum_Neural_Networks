@@ -25,6 +25,9 @@ class Model:
         else:
             self.output_layer = Output_Layer(self.hidden_layers[-1].get_output_dimension(), output_dimension, act_func)
 
+    def set_loss_function(self, loss_func):
+        self.loss_function = loss_func
+
     def add_layer(self, input_dimension, output_dimension, act_func):
         if len(self.hidden_layers) == 0:
             if self.input_layer_dimension != input_dimension:
@@ -69,12 +72,12 @@ class Model:
 
     def check_model(self):
         if self.input_layer_dimension is None or self.output_layer is None or self.loss_function is None:
-            raise RuntimeError("Model hasn't been provided with Input-, Outputlayer or Loss-Function.")
+            raise RuntimeError("Model hasn't been provided with Input-, Output Layer or Loss Function.")
 
     def activate_model(self, input_values):
         #just Check whether the Input-Data matches the Input-Dimension.
         if len(input_values) != self.input_layer_dimension:
-            raise ValueError("Uncompatible Dimensions: Last Layer: " + str(
+            raise ValueError("Incompatible Dimensions: Last Layer: " + str(
                 self.hidden_layers[-1].get_output_dimension()) + ", Found: " + str(input_values))
 
         #Starting with the first Hidden Layer, you compute the Values of the Neurons of the Following Layer using
@@ -86,4 +89,8 @@ class Model:
 
         self.output_layer.activate_layer(values)
 
-
+    def backpropagation(self, predictions, true_label):
+        #calculate the gradient for each individual output-neuron.
+        gradients = []
+        for i in range(len(predictions)):
+            gradients += [self.loss_function.derivative(predictions[i], true_label[i])]
