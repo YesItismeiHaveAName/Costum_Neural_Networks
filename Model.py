@@ -5,6 +5,7 @@ class Model:
     def __init__(self):
         self.hidden_layers = []
         self.input_layer_dimension = None
+        self.input_values = None
         self.output_layer = None
         self.loss_function = None
         pass
@@ -76,6 +77,7 @@ class Model:
 
     def activate_model(self, input_values):
         #just Check whether the Input-Data matches the Input-Dimension.
+        self.input_values = input_values
         if len(input_values) != self.input_layer_dimension:
             raise ValueError("Incompatible Dimensions: Last Layer: " + str(
                 self.hidden_layers[-1].get_output_dimension()) + ", Found: " + str(input_values))
@@ -89,8 +91,33 @@ class Model:
 
         self.output_layer.activate_layer(values)
 
-    def backpropagation(self, predictions, true_label):
+    def backpropagation(self, true_label, learn_rate):
         #calculate the gradient for each individual output-neuron.
-        gradients = []
-        for i in range(len(predictions)):
-            gradients += [self.loss_function.derivative(predictions[i], true_label[i])]
+        gradients = self.loss_function.derivative(self.get_output(), true_label)
+
+        if len(self.hidden_layers) == 0:
+            previous_neuron_values = self.input_values
+            self.output_layer.backpropagate(previous_neuron_values, gradients, learn_rate)
+        else:
+            previous_neuron_values = self.hidden_layers[-1].get_output_values()
+            self.output_layer.backpropagate(previous_neuron_values, gradients, learn_rate)
+            gradients = self.hidden_layers[-1].get_output_values()
+            for i in range(len(self.hidden_layers)):
+                layer_index = len(self.hidden_layers) - i - 1
+                if i == 0:
+
+                    self.hidden_layers[layer_index].backpropagate(self.hidden_layers[layer_index - 1].get_output_values(), gradients, learn_rate)
+                    gradients = self.hidden_layers[layer_index-1].get_output_values()
+                elif layer_index == 0:
+                    self.hidden_layers[layer_index].backpropagate(self.input_values, gradients, learn_rate)
+                else:
+
+                    self.hidden_layers[layer_index].backpropagate(self.hidden_layers[layer_index - 1].get_output_values(), gradients, learn_rate)
+                    gradients = self.hidden_layers[layer_index-1].get_output_values()
+
+    def train_model(self, data_set, labels, epochs, learn_rate=0.001):
+        for e in range(epochs):
+            for i in range(len(data_set)):
+                self.activate_model(data_set[i])
+                self.get_prediction()
+                self.backpropagation(labels[i], learn_rate)

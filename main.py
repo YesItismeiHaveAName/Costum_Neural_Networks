@@ -8,24 +8,20 @@ from Model import Model
 
 if __name__ == '__main__':
     x = Model()
-    input_data = [1,1,1,2,3,4,5]
-    labels = ['Car', 'Bird', 'Dog']
+    input_data = [0, 1]
+    labels = ['X', 'Y']
     x.add_input_layer(len(input_data))
-    x.add_layer(len(input_data), 10, RELU())
-    x.add_layer(10, 10, RELU())
-    x.add_layer(10, 10, RELU())
-    x.add_layer(10, 10, RELU())
-    x.add_layer(10, 10, RELU())
-    x.add_layer(10, 10, RELU())
-    x.add_layer(10, 10, RELU())
-    x.add_output_layer(3, SOFTMAX(2))
-    x.print_model_layers()
+    x.add_layer(2,2, RELU())
+    x.add_output_layer(2, LINEAR())
+    x.set_loss_function(SQUARED_ERROR())
     x.add_labels(labels)
 
+
+
+    data_set = [[1, 0], [1,0], [0,1],[0,1], [1, 0], [1,0], [0,1],[0,1]]
+    labels = [[1.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 1.0], [1.0, 0.0], [1.0, 0.0], [0.0, 1.0], [0.0, 1.0]]
+    x.train_model(data_set, labels, 2000, learn_rate=0.001)
+
     x.activate_model(input_data)
-    print(x.get_output())
-    print(x.check_softmax_sum())
     x.normalize_outputs()
-    print(x.get_output())
-    print(x.check_softmax_sum())
     x.get_prediction()

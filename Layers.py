@@ -22,10 +22,10 @@ class Layer:
             for x in range(len(self.connections[y])):
                 value += input_values[x] * self.connections[y][x]
             self.neurons[y].set_value(value + self.neurons[y].get_bias())
+            print(self.connections)
 
     def activate_neurons(self):
         all_neuron_values = self.get_output_values()
-        print(all_neuron_values)
         for neuron in self.neurons:
             neuron.set_value(self.activation_function.activate(neuron.get_value(), all_neuron_values))
 
@@ -49,7 +49,16 @@ class Layer:
             new_value = cut_decimals(neuron.get_value(), 2)
             neuron.set_value(new_value)
 
+    def print_layer(self):
+        print('Y: ' + str(self.get_output_dimension()) + ', X: ' + str(self.get_input_dimension()))
 
+    def backpropagate(self, previous_values, error_values, learn_rate):
+        #error_values haben die outputdimension.
+        #previous_values hat die Input_dimension
+        for y in range(len(self.connections)):
+            for x in range((len(self.connections[y]))):
+                self.connections[y][x] -= (learn_rate * error_values[y] * previous_values[x] * self.activation_function.get_derivative(self.neurons[y].get_value()))
+            self.neurons[y].set_bias(self.neurons[y].get_bias() - (learn_rate * error_values[y] * self.activation_function.get_derivative(self.neurons[y].get_value())))
 
 class Output_Layer(Layer):
     def __init__(self, input_dimension, output_dimension, activation_function):

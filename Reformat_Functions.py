@@ -7,5 +7,3 @@ def reduce_array_by_one_dimension(array):
     return result
 
 
-print(reduce_array_by_one_dimension([1, 2, 3]))
-

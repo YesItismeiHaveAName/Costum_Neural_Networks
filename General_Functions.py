@@ -34,24 +34,35 @@ class BINARY_STEP(Activation_Function):
         return 0.0
 
 class SOFTMAX(Activation_Function):
-    def __init__(self, exponent):
-        self.exponent = exponent
-
+    def __init__(self):
+        self.value = 0.0
     def activate(self, value, other_values):
         div = 0.0
         for num in other_values:
-            div += num**self.exponent
+            div += 2.718 ** num
         #important: when all values in the layer are 0s, then we return 1 / Number of Neurons of that Layer.
         if div == 0.0:
             return 1 / len(other_values)
-        return float(value**self.exponent / div)
+        self.value = float(2.718 ** value / div)
+        return float(2.718 ** value / div)
 
+    def get_derivative(self, value):
+        return self.value * (1-self.value)
 
 class Loss_Functions:
     def calculate_error(self, prediction, label):
         pass
-    def derivative(self, prediction, label, num_of_neurons):
+    def derivative(self, prediction, label):
         pass
+
+class LINEAR(Activation_Function):
+    def __init__(self):
+        pass
+    def activate(self, value, other_values):
+        return value
+
+    def get_derivative(self, value):
+        return 1
 
 class SQUARED_ERROR(Loss_Functions):
     def calculate_error(self, prediction, label):
@@ -61,8 +72,11 @@ class SQUARED_ERROR(Loss_Functions):
         result = result / len(prediction)
         return result
 
-    def derivative(self, prediction, label, num_of_neurons):
-        return (2/num_of_neurons) * (prediction - label)
+    def derivative(self, prediction, label):
+        result = []
+        for i in range(len(prediction)):
+            result += [(2/len(prediction)) * (prediction[i] - label[i])]
+        return result
 
 
 #add more Loss-Functions
