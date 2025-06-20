@@ -21,18 +21,24 @@ class Layer:
             value = 0.0
             for x in range(len(self.connections[y])):
                 value += input_values[x] * self.connections[y][x]
-            self.neurons[y].set_value(value + self.neurons[y].get_bias())
-            print(self.connections)
+            self.neurons[y].set_raw_value(value + self.neurons[y].get_bias())
 
     def activate_neurons(self):
-        all_neuron_values = self.get_output_values()
+        all_neuron_values = self.get_raw_values()
         for neuron in self.neurons:
-            neuron.set_value(self.activation_function.activate(neuron.get_value(), all_neuron_values))
+            neuron.set_value(self.activation_function.activate(neuron.get_raw_value(), all_neuron_values))
+
 
     def get_output_values(self):
         values = []
         for neuron in self.neurons:
             values += [neuron.get_value()]
+        return values
+
+    def get_raw_values(self):
+        values = []
+        for neuron in self.neurons:
+            values += [neuron.get_raw_value()]
         return values
 
     def activate_layer(self, input_values):
@@ -52,13 +58,27 @@ class Layer:
     def print_layer(self):
         print('Y: ' + str(self.get_output_dimension()) + ', X: ' + str(self.get_input_dimension()))
 
-    def backpropagate(self, previous_values, error_values, learn_rate):
-        #error_values haben die outputdimension.
+    def backpropagate(self, previous_values, gradients, learn_rate):
+        #gradients hat die Output_dimension.
         #previous_values hat die Input_dimension
-        for y in range(len(self.connections)):
-            for x in range((len(self.connections[y]))):
-                self.connections[y][x] -= (learn_rate * error_values[y] * previous_values[x] * self.activation_function.get_derivative(self.neurons[y].get_value()))
-            self.neurons[y].set_bias(self.neurons[y].get_bias() - (learn_rate * error_values[y] * self.activation_function.get_derivative(self.neurons[y].get_value())))
+
+        for y in range(self.get_output_dimension()):
+            for x in range(self.get_input_dimension()):
+                self.connections[y][x] -= (learn_rate * gradients[y] * previous_values[x] * self.activation_function.get_derivative(self.neurons[y].get_raw_value()))
+            self.neurons[y].set_bias(self.neurons[y].get_bias() - (learn_rate * gradients[y] * self.activation_function.get_derivative(self.neurons[y].get_raw_value())))
+
+    def calculate_gradients(self, next_layer_gradients):
+        raw_values = self.get_raw_values()
+        gradients = []
+        for i in range(self.get_input_dimension()):
+            gradient_i = 0.0
+            for j in range(self.get_output_dimension()):
+                gradient_i += self.connections[j][i] * next_layer_gradients[j]
+            gradients.append(gradient_i * self.activation_function.get_derivative(raw_values[j]))
+        return gradients
+
+
+
 
 class Output_Layer(Layer):
     def __init__(self, input_dimension, output_dimension, activation_function):
